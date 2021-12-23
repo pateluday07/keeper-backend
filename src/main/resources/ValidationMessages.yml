@@ -1,0 +1,6 @@
+note:
+  id:
+    null: Please provide Note id
+  title:
+    blank: Please enter Note title
+    length: Note title is too big, it should be less than 256 characters
