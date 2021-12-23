@@ -9,10 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import java.util.List;
-
-import static com.keeper.constant.MessagePropertyConstant.NOTE_ID_NULL_VALIDATION;
 
 @RestController
 @Log4j2
@@ -41,13 +38,13 @@ public class NoteController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<NoteDTO> getById(@NotNull(message = "{" + NOTE_ID_NULL_VALIDATION + "}") @PathVariable Long id) {
+    public ResponseEntity<NoteDTO> getById(@PathVariable Long id) {
         log.info("Get Note by id: {}", id);
         return ResponseEntity.ok(noteService.getById(id));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deleteById(@NotNull(message = "{" + NOTE_ID_NULL_VALIDATION + "}") @PathVariable Long id) {
+    public ResponseEntity<HttpStatus> deleteById(@PathVariable Long id) {
         log.info("Delete Note by id: {}", id);
         noteService.deleteById(id);
         return ResponseEntity.ok(HttpStatus.OK);
