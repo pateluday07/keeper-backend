@@ -41,6 +41,8 @@ public class NoteServiceImpl implements NoteService {
         log.info("Note to update: {}", note);
         if (note.getId() == null)
             throw badRequestException(messageSourceUtil.getMessage(NOTE_ID_NULL));
+        if (!noteRepository.existsById(note.getId()))
+            throw notFoundException(messageSourceUtil.getMessage(NOTE_NOT_FOUND) + note.getId());
         Note updatedNote = noteRepository.save(noteMapper.toEntity(note));
         log.info("Updated Note: {}", updatedNote);
         return noteMapper.toDto(updatedNote);
@@ -75,6 +77,6 @@ public class NoteServiceImpl implements NoteService {
     private Note getNoteEntityById(Long id) {
         return noteRepository
                 .findById(id)
-                .orElseThrow(() -> notFoundException(NOTE_NOT_FOUND + id));
+                .orElseThrow(() -> notFoundException(messageSourceUtil.getMessage(NOTE_NOT_FOUND) + id));
     }
 }

@@ -1,5 +1,0 @@
-note:
-  id:
-    not.null: To save Note id must be null
-    null: Please provide id to update Note
-  not.found: "Note is not available for the id: "
