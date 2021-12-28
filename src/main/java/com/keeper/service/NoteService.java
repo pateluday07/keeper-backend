@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface NoteService {
 
-    NoteDTO save(NoteDTO note);
+    void save(NoteDTO note);
 
     NoteDTO update(NoteDTO note);
 

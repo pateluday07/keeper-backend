@@ -20,9 +20,10 @@ public class NoteController {
     private final NoteService noteService;
 
     @PostMapping
-    public ResponseEntity<NoteDTO> save(@Valid @RequestBody NoteDTO noteDTO) {
+    public ResponseEntity<HttpStatus> save(@Valid @RequestBody NoteDTO noteDTO) {
         log.info("Note to save: {}", noteDTO);
-        return ResponseEntity.ok(noteService.save(noteDTO));
+        noteService.save(noteDTO);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PutMapping

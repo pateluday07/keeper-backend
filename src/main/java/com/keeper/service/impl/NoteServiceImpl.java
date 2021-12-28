@@ -27,13 +27,12 @@ public class NoteServiceImpl implements NoteService {
     private final NoteMapper noteMapper;
 
     @Override
-    public NoteDTO save(NoteDTO note) {
+    public void save(NoteDTO note) {
         log.info("Note to save: {}", note);
         if (note.getId() != null)
             throw badRequestException(messageSourceUtil.getMessage(NOTE_ID_NOT_NULL));
         Note savedNote = noteRepository.save(noteMapper.toEntity(note));
         log.info("Saved Note: {}", savedNote);
-        return noteMapper.toDto(savedNote);
     }
 
     @Override
