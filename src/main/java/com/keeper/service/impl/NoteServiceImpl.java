@@ -8,6 +8,7 @@ import com.keeper.service.NoteService;
 import com.keeper.util.MessageSourceUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -51,7 +52,7 @@ public class NoteServiceImpl implements NoteService {
     public List<NoteDTO> getAll() {
         log.info("Get all Notes");
         return noteRepository
-                .findAll()
+                .findAll(Sort.by("id"))
                 .stream()
                 .map(noteMapper::toDto)
                 .collect(Collectors.toList());
