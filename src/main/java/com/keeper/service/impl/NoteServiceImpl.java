@@ -37,7 +37,7 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
-    public NoteDTO update(NoteDTO note) {
+    public void update(NoteDTO note) {
         log.info("Note to update: {}", note);
         if (note.getId() == null)
             throw badRequestException(messageSourceUtil.getMessage(NOTE_ID_NULL));
@@ -45,14 +45,13 @@ public class NoteServiceImpl implements NoteService {
             throw notFoundException(messageSourceUtil.getMessage(NOTE_NOT_FOUND) + note.getId());
         Note updatedNote = noteRepository.save(noteMapper.toEntity(note));
         log.info("Updated Note: {}", updatedNote);
-        return noteMapper.toDto(updatedNote);
     }
 
     @Override
     public List<NoteDTO> getAll() {
         log.info("Get all Notes");
         return noteRepository
-                .findAll(Sort.by("id"))
+                .findAll(Sort.by(Sort.Direction.DESC, "id"))
                 .stream()
                 .map(noteMapper::toDto)
                 .collect(Collectors.toList());

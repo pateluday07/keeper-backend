@@ -8,7 +8,7 @@ public interface NoteService {
 
     void save(NoteDTO note);
 
-    NoteDTO update(NoteDTO note);
+    void update(NoteDTO note);
 
     List<NoteDTO> getAll();
 

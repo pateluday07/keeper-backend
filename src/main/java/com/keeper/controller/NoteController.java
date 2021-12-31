@@ -27,9 +27,10 @@ public class NoteController {
     }
 
     @PutMapping
-    public ResponseEntity<NoteDTO> update(@Valid @RequestBody NoteDTO noteDTO) {
+    public ResponseEntity<HttpStatus> update(@Valid @RequestBody NoteDTO noteDTO) {
         log.info("Note to update: {}", noteDTO);
-        return ResponseEntity.ok(noteService.update(noteDTO));
+        noteService.update(noteDTO);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping
@@ -48,6 +49,6 @@ public class NoteController {
     public ResponseEntity<HttpStatus> deleteById(@PathVariable Long id) {
         log.info("Delete Note by id: {}", id);
         noteService.deleteById(id);
-        return ResponseEntity.ok(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
