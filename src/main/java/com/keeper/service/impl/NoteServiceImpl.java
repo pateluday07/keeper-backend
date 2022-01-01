@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,6 +29,7 @@ public class NoteServiceImpl implements NoteService {
     private final NoteMapper noteMapper;
 
     @Override
+    @Transactional
     public void save(NoteDTO note) {
         log.info("Note to save: {}", note);
         if (note.getId() != null)
@@ -37,6 +39,7 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
+    @Transactional
     public void update(NoteDTO note) {
         log.info("Note to update: {}", note);
         if (note.getId() == null)
@@ -48,6 +51,7 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<NoteDTO> getAll() {
         log.info("Get all Notes");
         return noteRepository
@@ -58,6 +62,7 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public NoteDTO getById(Long id) {
         log.info("Get Note by id: {}", id);
         Note note = getNoteEntityById(id);
@@ -66,6 +71,7 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
+    @Transactional
     public void deleteById(Long id) {
         log.info("Delete Note by id: {}", id);
         Note note = getNoteEntityById(id);
