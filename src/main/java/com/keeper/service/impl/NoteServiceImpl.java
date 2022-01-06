@@ -12,6 +12,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,6 +32,8 @@ public class NoteServiceImpl implements NoteService {
     private final NoteRepository noteRepository;
     private final MessageSourceUtil messageSourceUtil;
     private final NoteMapper noteMapper;
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Override
     @Transactional
@@ -54,8 +61,14 @@ public class NoteServiceImpl implements NoteService {
     @Transactional(readOnly = true)
     public List<NoteDTO> getAll() {
         log.info("Get all Notes");
-        return noteRepository
-                .findAll(Sort.by(Sort.Direction.DESC, "id"))
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Note> criteriaQuery = criteriaBuilder.createQuery(Note.class);
+        Root<Note> root = criteriaQuery.from(Note.class);
+        criteriaQuery.select(criteriaBuilder.construct(Note.class, root.get("id"), root.get("title"),
+                criteriaBuilder.substring(root.get("description"), 1, 130)));
+        criteriaQuery.orderBy(criteriaBuilder.desc(root.get("id")));
+        List<Note> noteList = entityManager.createQuery(criteriaQuery).getResultList();
+        return noteList
                 .stream()
                 .map(noteMapper::toDto)
                 .collect(Collectors.toList());
