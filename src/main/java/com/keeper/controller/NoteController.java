@@ -51,4 +51,13 @@ public class NoteController {
         noteService.deleteById(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @GetMapping("/{id}/exists")
+    public ResponseEntity<HttpStatus> isExistsById(@PathVariable Long id) {
+        log.info("Is Note exists by id: {}", id);
+        if (noteService.isExistsById(id))
+            return new ResponseEntity<>(HttpStatus.OK);
+        else
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
 }

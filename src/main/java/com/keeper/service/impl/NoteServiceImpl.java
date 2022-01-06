@@ -8,7 +8,6 @@ import com.keeper.service.NoteService;
 import com.keeper.util.MessageSourceUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -90,6 +89,15 @@ public class NoteServiceImpl implements NoteService {
         Note note = getNoteEntityById(id);
         noteRepository.delete(note);
         log.info("Note successfully deleted for the id: {}", id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Boolean isExistsById(Long id) {
+        log.info("Is Note exists by id: {}", id);
+        Boolean isExists = noteRepository.existsById(id);
+        log.info("Note exists: {}, for the id: {}", isExists, id);
+        return isExists;
     }
 
     private Note getNoteEntityById(Long id) {
