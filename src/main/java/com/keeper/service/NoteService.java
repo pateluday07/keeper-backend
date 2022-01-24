@@ -15,4 +15,6 @@ public interface NoteService {
     NoteDTO getById(Long id);
 
     void deleteById(Long id);
+
+    Boolean isExistsById(Long id);
 }
