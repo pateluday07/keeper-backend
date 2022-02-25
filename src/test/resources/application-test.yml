@@ -1,0 +1,19 @@
+server:
+  port: 8080
+  error:
+    include-message: always
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:keeper_test
+    username: sa
+    password: 123456
+    driver-class-name: org.h2.Driver
+  jpa:
+    platform: h2
+    show-sql: true
+    hibernate:
+      ddl-auto: 'create-drop'
+
+cors:
+  origin: http://localhost:4200
