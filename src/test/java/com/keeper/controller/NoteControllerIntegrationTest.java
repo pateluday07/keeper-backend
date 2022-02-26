@@ -2,6 +2,7 @@ package com.keeper.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.keeper.dto.NoteDTO;
+import com.keeper.repository.NoteRepository;
 import com.keeper.service.NoteService;
 import com.keeper.util.MessageSourceUtil;
 import org.junit.jupiter.api.BeforeAll;
@@ -35,6 +36,8 @@ class NoteControllerIntegrationTest {
     @Autowired
     private NoteService noteService;
     @Autowired
+    private NoteRepository noteRepository;
+    @Autowired
     private MessageSourceUtil messageSourceUtil;
 
     @LocalServerPort
@@ -42,7 +45,7 @@ class NoteControllerIntegrationTest {
     private List<NoteDTO> noteDTOS;
 
     @BeforeAll
-    static void init() {
+    static void initHttpHeaders() {
         HTTP_HEADERS.setContentType(MediaType.APPLICATION_JSON);
     }
 
@@ -59,6 +62,11 @@ class NoteControllerIntegrationTest {
         noteDTOS = Arrays.asList(noteTwo, noteTwo);
     }
 
+    @BeforeEach
+    void emptyNoteTable(){
+        noteRepository.deleteAll();
+    }
+
     @Test
     void ifNoteIdNotNull_whenSaveNote_thenThrowBadRequestException() {
         NoteDTO noteDTO = noteDTOS.get(0);
@@ -73,7 +81,15 @@ class NoteControllerIntegrationTest {
     }
 
     @Test
-    void whenNotesNotAvailable_thenListShouldBeEmpty() {
+    void ifNoteValid_whenSaveNote_thenStatusShouldBeCreated() {
+        ResponseEntity<HttpStatus> response = REST_TEMPLATE.postForEntity(URL + port + API_PREFIX,
+                new HttpEntity<>(noteDTOS.get(0), HTTP_HEADERS), HttpStatus.class);
+        assertFalse(response.hasBody());
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+    }
+
+    @Test
+    void ifNotesUnAvailable_whenGetAllNotes_thenListShouldBeEmpty() {
         ResponseEntity<List<NoteDTO>> response = REST_TEMPLATE.exchange(URL + port + API_PREFIX, HttpMethod.GET, null,
                 new ParameterizedTypeReference<>() {
                 });
@@ -83,7 +99,7 @@ class NoteControllerIntegrationTest {
     }
 
     @Test
-    void whenNotesAvailable_thenListShouldNotBeEmpty() {
+    void ifNotesAvailable_whenGetAllNotes_thenListShouldNotBeEmpty() {
         noteService.save(noteDTOS.get(0));
         noteService.save(noteDTOS.get(1));
         ResponseEntity<List<NoteDTO>> response = REST_TEMPLATE.exchange(URL + port + API_PREFIX, HttpMethod.GET, null,
