@@ -20,7 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import static com.keeper.constant.MessagePropertyConstant.NOTE_ID_NOT_NULL;
+import static com.keeper.constant.MessagePropertyConstant.*;
 import static com.keeper.constants.TestConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -63,8 +63,44 @@ class NoteControllerIntegrationTest {
     }
 
     @BeforeEach
-    void emptyNoteTable(){
+    void emptyNoteTable() {
         noteRepository.deleteAll();
+    }
+
+    @Test
+    void ifNoteTitleNull_whenSaveNote_thenThrowBadRequestException(){
+        NoteDTO noteDTO = noteDTOS.get(0);
+        noteDTO.setTitle(null);
+        ResponseEntity<JsonNode> exception = REST_TEMPLATE.postForEntity(URL + port + API_PREFIX,
+                new HttpEntity<>(noteDTO, HTTP_HEADERS), JsonNode.class);
+        assertTrue(exception.hasBody());
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        assertEquals(messageSourceUtil.getMessage(VAL_NOTE_TITLE_BLANK),
+                Objects.requireNonNull(exception.getBody()).get(EXCEPTION_MESSAGE_KEY).asText());
+    }
+
+    @Test
+    void ifNoteTitleEmpty_whenSaveNote_thenThrowBadRequestException(){
+        NoteDTO noteDTO = noteDTOS.get(0);
+        noteDTO.setTitle("");
+        ResponseEntity<JsonNode> exception = REST_TEMPLATE.postForEntity(URL + port + API_PREFIX,
+                new HttpEntity<>(noteDTO, HTTP_HEADERS), JsonNode.class);
+        assertTrue(exception.hasBody());
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        assertEquals(messageSourceUtil.getMessage(VAL_NOTE_TITLE_BLANK),
+                Objects.requireNonNull(exception.getBody()).get(EXCEPTION_MESSAGE_KEY).asText());
+    }
+
+    @Test
+    void ifNoteTitleTooLong_whenSaveNote_thenThrowBadRequestException() {
+        NoteDTO noteDTO = noteDTOS.get(1);
+        noteDTO.setTitle(NOTE_TOO_LING_TITLE);
+        ResponseEntity<JsonNode> exception = REST_TEMPLATE.postForEntity(URL + port + API_PREFIX,
+                new HttpEntity<>(noteDTO, HTTP_HEADERS), JsonNode.class);
+        assertTrue(exception.hasBody());
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        assertEquals(messageSourceUtil.getMessage(VAL_NOTE_TITLE_LENGTH),
+                Objects.requireNonNull(exception.getBody()).get(EXCEPTION_MESSAGE_KEY).asText());
     }
 
     @Test

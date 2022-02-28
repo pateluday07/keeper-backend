@@ -7,8 +7,8 @@ import lombok.ToString;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
-import static com.keeper.constant.MessagePropertyConstant.NOTE_TITLE_BLANK;
-import static com.keeper.constant.MessagePropertyConstant.NOTE_TITLE_LENGTH;
+import static com.keeper.constant.MessagePropertyConstant.VAL_NOTE_TITLE_BLANK;
+import static com.keeper.constant.MessagePropertyConstant.VAL_NOTE_TITLE_LENGTH;
 
 @Getter
 @Setter
@@ -16,8 +16,8 @@ import static com.keeper.constant.MessagePropertyConstant.NOTE_TITLE_LENGTH;
 public class NoteDTO {
 
     private Long id;
-    @NotBlank(message = "{" + NOTE_TITLE_BLANK + "}")
-    @Size(max = 255, message = "{" + NOTE_TITLE_LENGTH + "}")
+    @NotBlank(message = "{" + VAL_NOTE_TITLE_BLANK + "}")
+    @Size(max = 255, message = "{" + VAL_NOTE_TITLE_LENGTH + "}")
     private String title;
     private String description;
 }

@@ -12,7 +12,7 @@ public class MessagePropertyFileConfig {
     public MessageSource messageSource() {
         ReloadableResourceBundleMessageSource messageSource
                 = new ReloadableResourceBundleMessageSource();
-        messageSource.setBasename("classpath:/messages/error-messages");
+        messageSource.setBasenames("classpath:/messages/error-messages", "classpath:/ValidationMessages");
         return messageSource;
     }
 }
