@@ -68,52 +68,52 @@ class NoteControllerIntegrationTest {
     }
 
     @Test
-    void ifNoteTitleNull_whenSaveNote_thenThrowBadRequestException(){
+    void ifNoteTitleNull_whenSaveNote_thenThrowBadRequestException() {
         NoteDTO noteDTO = noteDTOS.get(0);
         noteDTO.setTitle(null);
-        ResponseEntity<JsonNode> exception = REST_TEMPLATE.postForEntity(URL + port + API_PREFIX,
+        ResponseEntity<JsonNode> response = REST_TEMPLATE.postForEntity(URL + port + API_PREFIX,
                 new HttpEntity<>(noteDTO, HTTP_HEADERS), JsonNode.class);
-        assertTrue(exception.hasBody());
-        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        assertTrue(response.hasBody());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertEquals(messageSourceUtil.getMessage(VAL_NOTE_TITLE_BLANK),
-                Objects.requireNonNull(exception.getBody()).get(EXCEPTION_MESSAGE_KEY).asText());
+                Objects.requireNonNull(response.getBody()).get(EXCEPTION_MESSAGE_KEY).asText());
     }
 
     @Test
-    void ifNoteTitleEmpty_whenSaveNote_thenThrowBadRequestException(){
+    void ifNoteTitleEmpty_whenSaveNote_thenThrowBadRequestException() {
         NoteDTO noteDTO = noteDTOS.get(0);
         noteDTO.setTitle("");
-        ResponseEntity<JsonNode> exception = REST_TEMPLATE.postForEntity(URL + port + API_PREFIX,
+        ResponseEntity<JsonNode> response = REST_TEMPLATE.postForEntity(URL + port + API_PREFIX,
                 new HttpEntity<>(noteDTO, HTTP_HEADERS), JsonNode.class);
-        assertTrue(exception.hasBody());
-        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        assertTrue(response.hasBody());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertEquals(messageSourceUtil.getMessage(VAL_NOTE_TITLE_BLANK),
-                Objects.requireNonNull(exception.getBody()).get(EXCEPTION_MESSAGE_KEY).asText());
+                Objects.requireNonNull(response.getBody()).get(EXCEPTION_MESSAGE_KEY).asText());
     }
 
     @Test
     void ifNoteTitleTooLong_whenSaveNote_thenThrowBadRequestException() {
         NoteDTO noteDTO = noteDTOS.get(1);
         noteDTO.setTitle(NOTE_TOO_LING_TITLE);
-        ResponseEntity<JsonNode> exception = REST_TEMPLATE.postForEntity(URL + port + API_PREFIX,
+        ResponseEntity<JsonNode> response = REST_TEMPLATE.postForEntity(URL + port + API_PREFIX,
                 new HttpEntity<>(noteDTO, HTTP_HEADERS), JsonNode.class);
-        assertTrue(exception.hasBody());
-        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        assertTrue(response.hasBody());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertEquals(messageSourceUtil.getMessage(VAL_NOTE_TITLE_LENGTH),
-                Objects.requireNonNull(exception.getBody()).get(EXCEPTION_MESSAGE_KEY).asText());
+                Objects.requireNonNull(response.getBody()).get(EXCEPTION_MESSAGE_KEY).asText());
     }
 
     @Test
     void ifNoteIdNotNull_whenSaveNote_thenThrowBadRequestException() {
         NoteDTO noteDTO = noteDTOS.get(0);
         noteDTO.setId(1L);
-        ResponseEntity<JsonNode> exception = REST_TEMPLATE.postForEntity(URL + port + API_PREFIX,
+        ResponseEntity<JsonNode> response = REST_TEMPLATE.postForEntity(URL + port + API_PREFIX,
                 new HttpEntity<>(noteDTO, HTTP_HEADERS), JsonNode.class);
-        assertTrue(exception.hasBody());
-        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
-        assertEquals(HttpStatus.BAD_REQUEST.value(), Objects.requireNonNull(exception.getBody()).get(EXCEPTION_STATUS_KEY).asInt());
-        assertEquals(API_PREFIX, exception.getBody().get(EXCEPTION_PATH_KEY).asText());
-        assertEquals(messageSourceUtil.getMessage(NOTE_ID_NOT_NULL), exception.getBody().get(EXCEPTION_MESSAGE_KEY).asText());
+        assertTrue(response.hasBody());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), Objects.requireNonNull(response.getBody()).get(EXCEPTION_STATUS_KEY).asInt());
+        assertEquals(API_PREFIX, response.getBody().get(EXCEPTION_PATH_KEY).asText());
+        assertEquals(messageSourceUtil.getMessage(NOTE_ID_NOT_NULL), response.getBody().get(EXCEPTION_MESSAGE_KEY).asText());
     }
 
     @Test
@@ -122,6 +122,71 @@ class NoteControllerIntegrationTest {
                 new HttpEntity<>(noteDTOS.get(0), HTTP_HEADERS), HttpStatus.class);
         assertFalse(response.hasBody());
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
+    }
+
+    @Test
+    void ifNoteTitleNull_whenUpdateNote_thenThrowBadRequestException() {
+        NoteDTO noteDTO = noteDTOS.get(0);
+        noteDTO.setTitle(null);
+        ResponseEntity<JsonNode> response = REST_TEMPLATE.exchange(URL + port + API_PREFIX, HttpMethod.PUT,
+                new HttpEntity<>(noteDTO, HTTP_HEADERS), JsonNode.class);
+        assertTrue(response.hasBody());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals(messageSourceUtil.getMessage(VAL_NOTE_TITLE_BLANK),
+                Objects.requireNonNull(response.getBody()).get(EXCEPTION_MESSAGE_KEY).asText());
+    }
+
+    @Test
+    void ifNoteTitleEmpty_whenUpdateNote_thenThrowBadRequestException() {
+        NoteDTO noteDTO = noteDTOS.get(0);
+        noteDTO.setTitle("");
+        ResponseEntity<JsonNode> response = REST_TEMPLATE.exchange(URL + port + API_PREFIX, HttpMethod.PUT,
+                new HttpEntity<>(noteDTO, HTTP_HEADERS), JsonNode.class);
+        assertTrue(response.hasBody());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals(messageSourceUtil.getMessage(VAL_NOTE_TITLE_BLANK),
+                Objects.requireNonNull(response.getBody()).get(EXCEPTION_MESSAGE_KEY).asText());
+    }
+
+    @Test
+    void ifNoteIdNull_whenUpdateNote_thenThrowBadRequestException() {
+        NoteDTO noteDTO = noteDTOS.get(0);
+        ResponseEntity<JsonNode> response = REST_TEMPLATE.exchange(URL + port + API_PREFIX, HttpMethod.PUT,
+                new HttpEntity<>(noteDTO, HTTP_HEADERS), JsonNode.class);
+        assertTrue(response.hasBody());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), Objects.requireNonNull(response.getBody()).get(EXCEPTION_STATUS_KEY).asInt());
+        assertEquals(API_PREFIX, response.getBody().get(EXCEPTION_PATH_KEY).asText());
+        assertEquals(messageSourceUtil.getMessage(NOTE_ID_NULL), response.getBody().get(EXCEPTION_MESSAGE_KEY).asText());
+    }
+
+    @Test
+    void ifNoteNotFound_whenUpdateNote_thenThrowNotFoundException() {
+        NoteDTO noteDTO = noteDTOS.get(0);
+        noteDTO.setId(1L);
+        ResponseEntity<JsonNode> response = REST_TEMPLATE.exchange(URL + port + API_PREFIX, HttpMethod.PUT,
+                new HttpEntity<>(noteDTO, HTTP_HEADERS), JsonNode.class);
+        assertTrue(response.hasBody());
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND.value(), Objects.requireNonNull(response.getBody()).get(EXCEPTION_STATUS_KEY).asInt());
+        assertEquals(API_PREFIX, response.getBody().get(EXCEPTION_PATH_KEY).asText());
+        assertEquals(messageSourceUtil.getMessage(NOTE_NOT_FOUND) + noteDTO.getId(), response.getBody().get(EXCEPTION_MESSAGE_KEY).asText());
+    }
+
+    @Test
+    void ifNoteValid_whenUpdateNote_thenReturnHttpStatusOkAndNoteShouldBeUpdated() {
+        NoteDTO noteDTO = noteDTOS.get(0);
+        noteService.save(noteDTO);
+        noteDTO = noteService.getById(1L);
+        noteDTO.setTitle("New Title");
+        noteDTO.setDescription("My New Title");
+        ResponseEntity<JsonNode> response = REST_TEMPLATE.exchange(URL + port + API_PREFIX, HttpMethod.PUT,
+                new HttpEntity<>(noteDTO, HTTP_HEADERS), JsonNode.class);
+        assertFalse(response.hasBody());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        NoteDTO updatedNote = noteService.getById(1L);
+        assertEquals(noteDTO.getTitle(), updatedNote.getTitle());
+        assertEquals(noteDTO.getDescription(), updatedNote.getDescription());
     }
 
     @Test
