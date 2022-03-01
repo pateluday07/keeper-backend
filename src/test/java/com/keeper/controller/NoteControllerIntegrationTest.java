@@ -117,11 +117,15 @@ class NoteControllerIntegrationTest {
     }
 
     @Test
-    void ifNoteValid_whenSaveNote_thenStatusShouldBeCreated() {
+    void ifNoteValid_whenSaveNote_thenReturnStatusCreatedAndNoteShouldBeCreated() {
         ResponseEntity<HttpStatus> response = REST_TEMPLATE.postForEntity(URL + port + API_PREFIX,
                 new HttpEntity<>(noteDTOS.get(0), HTTP_HEADERS), HttpStatus.class);
         assertFalse(response.hasBody());
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        NoteDTO savedNote = noteService.getAll().get(0);
+        assertNotNull(savedNote.getId());
+        assertEquals(noteDTOS.get(0).getTitle(), savedNote.getTitle());
+        assertEquals(noteDTOS.get(0).getDescription(), savedNote.getDescription());
     }
 
     @Test
@@ -177,14 +181,14 @@ class NoteControllerIntegrationTest {
     void ifNoteValid_whenUpdateNote_thenReturnHttpStatusOkAndNoteShouldBeUpdated() {
         NoteDTO noteDTO = noteDTOS.get(0);
         noteService.save(noteDTO);
-        noteDTO = noteService.getById(1L);
+        noteDTO = noteService.getAll().get(0);
         noteDTO.setTitle("New Title");
         noteDTO.setDescription("My New Title");
         ResponseEntity<JsonNode> response = REST_TEMPLATE.exchange(URL + port + API_PREFIX, HttpMethod.PUT,
                 new HttpEntity<>(noteDTO, HTTP_HEADERS), JsonNode.class);
         assertFalse(response.hasBody());
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        NoteDTO updatedNote = noteService.getById(1L);
+        NoteDTO updatedNote = noteService.getById(noteDTO.getId());
         assertEquals(noteDTO.getTitle(), updatedNote.getTitle());
         assertEquals(noteDTO.getDescription(), updatedNote.getDescription());
     }
