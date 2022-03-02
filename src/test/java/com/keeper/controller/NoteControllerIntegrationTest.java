@@ -248,4 +248,28 @@ class NoteControllerIntegrationTest {
         assertEquals(noteDTO.getDescription(), response.getBody().getDescription());
     }
 
+    @Test
+    void ifNoteUnAvailable_whenDeleteNoteById_thenThrowNotFoundException() {
+        var id = 1L;
+        ResponseEntity<JsonNode> response = REST_TEMPLATE.exchange(URL + port + API_PREFIX + id, HttpMethod.DELETE
+                , new HttpEntity<>(HTTP_HEADERS), JsonNode.class);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertTrue(response.hasBody());
+        assertEquals(HttpStatus.NOT_FOUND.value(), Objects.requireNonNull(response.getBody()).get(EXCEPTION_STATUS_KEY).asInt());
+        assertEquals(API_PREFIX + id, response.getBody().get(EXCEPTION_PATH_KEY).asText());
+        assertEquals(messageSourceUtil.getMessage(NOTE_NOT_FOUND) + id, response.getBody().get(EXCEPTION_MESSAGE_KEY).asText());
+    }
+
+    @Test
+    void ifNoteAvailable_whenDeleteNoteById_thenDeleteNote() {
+        var noteDTO = noteDTOS.get(0);
+        noteService.save(noteDTO);
+        var id = noteService.getAll().get(0).getId();
+        ResponseEntity<HttpStatus> response = REST_TEMPLATE.exchange(URL + port + API_PREFIX + id, HttpMethod.DELETE
+                , new HttpEntity<>(HTTP_HEADERS), HttpStatus.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertFalse(response.hasBody());
+        assertFalse(noteService.isExistsById(id));
+    }
+
 }
