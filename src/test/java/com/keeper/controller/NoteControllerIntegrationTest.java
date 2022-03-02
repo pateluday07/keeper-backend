@@ -195,7 +195,7 @@ class NoteControllerIntegrationTest {
 
     @Test
     void ifNotesUnAvailable_whenGetAllNotes_thenListShouldBeEmpty() {
-        ResponseEntity<List<NoteDTO>> response = REST_TEMPLATE.exchange(URL + port + API_PREFIX, HttpMethod.GET, null,
+        ResponseEntity<List<NoteDTO>> response = REST_TEMPLATE.exchange(URL + port + API_PREFIX, HttpMethod.GET, new HttpEntity<>(HTTP_HEADERS),
                 new ParameterizedTypeReference<>() {
                 });
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -207,7 +207,7 @@ class NoteControllerIntegrationTest {
     void ifNotesAvailable_whenGetAllNotes_thenListShouldNotBeEmpty() {
         noteService.save(noteDTOS.get(0));
         noteService.save(noteDTOS.get(1));
-        ResponseEntity<List<NoteDTO>> response = REST_TEMPLATE.exchange(URL + port + API_PREFIX, HttpMethod.GET, null,
+        ResponseEntity<List<NoteDTO>> response = REST_TEMPLATE.exchange(URL + port + API_PREFIX, HttpMethod.GET, new HttpEntity<>(HTTP_HEADERS),
                 new ParameterizedTypeReference<>() {
                 });
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -220,6 +220,32 @@ class NoteControllerIntegrationTest {
         assertEquals(noteDTOS.get(0).getDescription(), response.getBody().get(0).getDescription());
         assertEquals(noteDTOS.get(1).getTitle(), response.getBody().get(1).getTitle());
         assertEquals(noteDTOS.get(1).getDescription(), response.getBody().get(1).getDescription());
+    }
+
+    @Test
+    void ifNoteUnAvailable_whenGetNoteById_thenThrowNotFoundException() {
+        var id = 1L;
+        ResponseEntity<JsonNode> response = REST_TEMPLATE.exchange(URL + port + API_PREFIX + id, HttpMethod.GET
+                , new HttpEntity<>(HTTP_HEADERS), JsonNode.class);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertTrue(response.hasBody());
+        assertEquals(HttpStatus.NOT_FOUND.value(), Objects.requireNonNull(response.getBody()).get(EXCEPTION_STATUS_KEY).asInt());
+        assertEquals(API_PREFIX + id, response.getBody().get(EXCEPTION_PATH_KEY).asText());
+        assertEquals(messageSourceUtil.getMessage(NOTE_NOT_FOUND) + id, response.getBody().get(EXCEPTION_MESSAGE_KEY).asText());
+    }
+
+    @Test
+    void ifNoteAvailable_whenGetNoteById_thenGetANote() {
+        var noteDTO = noteDTOS.get(0);
+        noteService.save(noteDTO);
+        var id = noteService.getAll().get(0).getId();
+        ResponseEntity<NoteDTO> response = REST_TEMPLATE.exchange(URL + port + API_PREFIX + id, HttpMethod.GET
+                , new HttpEntity<>(HTTP_HEADERS), NoteDTO.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertTrue(response.hasBody());
+        assertEquals(id, Objects.requireNonNull(response.getBody()).getId());
+        assertEquals(noteDTO.getTitle(), response.getBody().getTitle());
+        assertEquals(noteDTO.getDescription(), response.getBody().getDescription());
     }
 
 }
