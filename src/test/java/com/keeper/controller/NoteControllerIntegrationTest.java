@@ -30,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class NoteControllerIntegrationTest {
 
     private static final String API_PREFIX = "/api/notes/";
+    private static final String IS_NOTE_EXISTS_API = "/exists";
     private static final TestRestTemplate REST_TEMPLATE = new TestRestTemplate();
     private static final HttpHeaders HTTP_HEADERS = new HttpHeaders();
 
@@ -270,6 +271,25 @@ class NoteControllerIntegrationTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertFalse(response.hasBody());
         assertFalse(noteService.isExistsById(id));
+    }
+
+    @Test
+    void ifNoteUnavailable_whenNoteExistsById_thenReturnNotFound() {
+        var id = 1L;
+        ResponseEntity<HttpStatus> response = REST_TEMPLATE.exchange(URL + port + API_PREFIX + id + IS_NOTE_EXISTS_API, HttpMethod.GET
+                , new HttpEntity<>(HTTP_HEADERS), HttpStatus.class);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertFalse(response.hasBody());
+    }
+
+    @Test
+    void ifNoteAvailable_whenNoteExistsById_thenReturnOk() {
+        noteService.save(noteDTOS.get(0));
+        var id = noteService.getAll().get(0).getId();
+        ResponseEntity<HttpStatus> response = REST_TEMPLATE.exchange(URL + port + API_PREFIX + id + IS_NOTE_EXISTS_API, HttpMethod.GET
+                , new HttpEntity<>(HTTP_HEADERS), HttpStatus.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertFalse(response.hasBody());
     }
 
 }
